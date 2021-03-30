@@ -24,11 +24,11 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
 
   static const MethodChannel _cookieManagerChannel = MethodChannel('plugins.flutter.io/cookie_manager');
 
-  Future<bool> _onMethodCall(MethodCall call) async {
+  Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'javascriptChannelMessage':
-        final String channel = call.arguments['channel'];
-        final String message = call.arguments['message'];
+        final String? channel = call.arguments['channel'];
+        final String? message = call.arguments['message'];
         _platformCallbacksHandler.onJavaScriptChannelMessage(channel, message);
         return true;
       case 'navigationRequest':
@@ -65,7 +65,7 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   @override
   Future<void> loadUrl(
     String url,
-    Map<String, String> headers,
+    Map<String, String>? headers,
   ) {
     assert(url != null);
     return _channel.invokeMethod<void>('loadUrl', <String, dynamic>{
@@ -77,10 +77,10 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   @override
   Future<void> loadData(
     String data,
-    String baseUrl,
-    String mimeType,
-    String encoding,
-    String historyUrl,
+    String? baseUrl,
+    String? mimeType,
+    String? encoding,
+    String? historyUrl,
   ) {
     assert(data != null);
     return _channel.invokeMethod<void>('loadData', <String, dynamic>{
@@ -93,13 +93,13 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   }
 
   @override
-  Future<String> currentUrl() => _channel.invokeMethod<String>('currentUrl');
+  Future<String?> currentUrl() => _channel.invokeMethod<String>('currentUrl');
 
   @override
-  Future<bool> canGoBack() => _channel.invokeMethod<bool>("canGoBack");
+  Future<bool?> canGoBack() => _channel.invokeMethod<bool>("canGoBack");
 
   @override
-  Future<bool> canGoForward() => _channel.invokeMethod<bool>("canGoForward");
+  Future<bool?> canGoForward() => _channel.invokeMethod<bool>("canGoForward");
 
   @override
   Future<void> goBack() => _channel.invokeMethod<void>("goBack");
@@ -114,7 +114,7 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   Future<void> clearCache() => _channel.invokeMethod<void>("clearCache");
 
   @override
-  Future<void> updateSettings(WebSettings settings) {
+  Future<void>? updateSettings(WebSettings settings) {
     final Map<String, dynamic> updatesMap = _webSettingsToMap(settings);
     if (updatesMap.isEmpty) {
       return null;
@@ -123,7 +123,7 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   }
 
   @override
-  Future<String> evaluateJavascript(String javascriptString) {
+  Future<String?> evaluateJavascript(String javascriptString) {
     return _channel.invokeMethod<String>('evaluateJavascript', javascriptString);
   }
 
@@ -138,7 +138,7 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   }
 
   @override
-  Future<String> getTitle() => _channel.invokeMethod<String>("getTitle");
+  Future<String?> getTitle() => _channel.invokeMethod<String>("getTitle");
 
   /// Method channel implementation for [WebViewPlatform.clearCookies].
   static Future<bool> clearCookies() {
@@ -176,14 +176,14 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   static Map<String, dynamic> creationParamsToMap(CreationParams creationParams) {
     final map = <String, dynamic>{};
     if (creationParams.initialUrl == null)
-      map['initialData'] = creationParams.initialData.toMap();
+      map['initialData'] = creationParams.initialData!.toMap();
     else
       map['initialUrl'] = creationParams.initialUrl;
 
     return map
       ..addAll({
-        'settings': _webSettingsToMap(creationParams.webSettings),
-        'javascriptChannelNames': creationParams.javascriptChannelNames.toList(),
+        'settings': _webSettingsToMap(creationParams.webSettings!),
+        'javascriptChannelNames': creationParams.javascriptChannelNames!.toList(),
         'userAgent': creationParams.userAgent,
         'autoMediaPlaybackPolicy': creationParams.autoMediaPlaybackPolicy.index,
       });
